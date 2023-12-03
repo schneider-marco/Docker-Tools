@@ -7,9 +7,14 @@ datetime=$(date +"%Y-%m-%d_%H-%M-%S")
 keepbackup=10
 filename="$datetime-backup.tar.gz"
 
+# Function to print messages with formatting
+print_message() {
+    echo -e "\e[1;32m$1\e[0m"  # Display messages in green color
+}
+
 # Check if target directory exists, if not, create it
 if [ ! -d "$targetdir" ]; then
-    echo "Creating target directory: $targetdir"
+    print_message "Creating target directory: $targetdir"
     mkdir -p "$targetdir"
 fi
 
@@ -18,23 +23,23 @@ echo -e "\e[1;31mWARNING: All containers will be stopped.\e[0m"
 read -p "Do you want to proceed? (y/n): " response
 
 if [[ ! $response =~ ^[Yy]$ ]]; then
-    echo "Script aborted."
+    print_message "Script aborted."
     exit 1
 fi
 
 # Stop Docker containers
-echo "Stopping Docker containers..."
+print_message "Stopping Docker containers..."
 container_ids=$(docker ps -q)
 for container_id in $container_ids; do
     docker stop $container_id
 done
 
 # Create a tarball of the Docker volumes
-echo "Creating backup..."
+print_message "Creating backup..."
 sudo tar -czf "$targetdir/$filename" "$sourcedir"
 
 # Start Docker containers
-echo "Starting Docker containers..."
+print_message "Starting Docker containers..."
 for container_id in $container_ids; do
     docker start $container_id
 done
@@ -43,4 +48,4 @@ done
 # Uncomment the following line if you want to delete old backups
 # find "$targetdir" -type f -name '*.tar.gz' -mtime +$keepbackup -exec rm {} \;
 
-echo "Backup completed successfully."
+print_message "Backup completed successfully."
