@@ -7,6 +7,12 @@ datetime=$(date +"%Y-%m-%d_%H-%M-%S")
 keepbackup=10
 filename="$datetime-backup.tar.gz"
 
+# Check if target directory exists, if not, create it
+if [ ! -d "$targetdir" ]; then
+    echo "Creating target directory: $targetdir"
+    mkdir -p "$targetdir"
+fi
+
 # Display a warning and prompt for confirmation
 echo -e "\e[1;31mWARNING: All containers will be stopped.\e[0m"
 read -p "Do you want to proceed? (y/n): " response
