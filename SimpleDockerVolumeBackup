@@ -1,23 +1,40 @@
 #!/bin/bash
 
+# Define source and target directories
 sourcedir="/var/lib/docker/volumes"
 targetdir="/home/$USER/docker_backup"
 datetime=$(date +"%Y-%m-%d_%H-%M-%S")
-container_ids=$(docker ps -q)
 keepbackup=10
+filename="$datetime-backup.tar.gz"
 
-# Stop docker containers
+# Display a warning and prompt for confirmation
+echo -e "\e[1;31mWARNING: All containers will be stopped.\e[0m"
+read -p "Do you want to proceed? (y/n): " response
+
+if [[ ! $response =~ ^[Yy]$ ]]; then
+    echo "Script aborted."
+    exit 1
+fi
+
+# Stop Docker containers
+echo "Stopping Docker containers..."
+container_ids=$(docker ps -q)
 for container_id in $container_ids; do
     docker stop $container_id
 done
 
-# Create tar
-tar -czf "$targetdir/$datetime-backup.tar.gz" "$sourcedir"
-# Start containers
+# Create a tarball of the Docker volumes
+echo "Creating backup..."
+sudo tar -czf "$targetdir/$filename" "$sourcedir"
+
+# Start Docker containers
+echo "Starting Docker containers..."
 for container_id in $container_ids; do
     docker start $container_id
 done
 
+# Delete backups older than $keepbackup days
+# Uncomment the following line if you want to delete old backups
+# find "$targetdir" -type f -name '*.tar.gz' -mtime +$keepbackup -exec rm {} \;
 
-# delete files older that keepbackup variable
-#find "$targetdir" -type f -name '*.tar.gz' -mtime +$keepbackup -exec rm {} \;
+echo "Backup completed successfully."
