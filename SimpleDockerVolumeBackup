@@ -1,0 +1,23 @@
+#!/bin/bash
+
+sourcedir="/var/lib/docker/volumes"
+targetdir="/home/$USER/docker_backup"
+datetime=$(date +"%Y-%m-%d_%H-%M-%S")
+container_ids=$(docker ps -q)
+keepbackup=10
+
+# Stop docker containers
+for container_id in $container_ids; do
+    docker stop $container_id
+done
+
+# Create tar
+tar -czf "$targetdir/$datetime-backup.tar.gz" "$sourcedir"
+# Start containers
+for container_id in $container_ids; do
+    docker start $container_id
+done
+
+
+# delete files older that keepbackup variable
+#find "$targetdir" -type f -name '*.tar.gz' -mtime +$keepbackup -exec rm {} \;
