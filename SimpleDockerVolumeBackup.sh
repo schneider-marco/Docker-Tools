@@ -36,7 +36,7 @@ done
 
 # Create a tarball of the Docker volumes
 print_message "Creating backup..."
-sudo tar -czf "$targetdir/$filename" "$sourcedir"
+sudo tar -czvf "$targetdir/$filename" -C "$sourcedir" .
 
 # Start Docker containers
 print_message "Starting Docker containers..."
