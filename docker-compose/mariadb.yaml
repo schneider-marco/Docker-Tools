@@ -1,0 +1,15 @@
+version: '3'
+volumes:
+  data:
+services:
+  db:
+    image: mariadb:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: Welcome22!
+      MYSQL_DATABASE: mqttdata
+      MYSQL_USER: user
+      MYSQL_PASSWORD: Welcome22!
+    volumes:
+      - data:/var/lib/mysql
+    ports:
+      - "3306:3306"
